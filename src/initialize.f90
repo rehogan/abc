@@ -39,6 +39,9 @@ subroutine initialize
   t_li(11:12) = 373.371_dp
   t_li(13:14) = 880.736_dp
   t_li(3:22) = 1000._dp
+  t_li(1:2) = 300._dp
+  t_li(23:24) = 1300._dp
+
 
   first_index = 1          ! first index of time(i): (n-1), (n), (n+1)
 

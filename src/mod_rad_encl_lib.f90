@@ -596,13 +596,14 @@ subroutine bc_del_encl_rad(U)
   integer,  dimension(2)   :: nn_b
   real(dp)                 :: t_i, t_j, coef
   real(dp), dimension(4)   :: q_r, tbar, e_b, sij
-  real(dp), dimension(2)   :: res
-  real(dp), dimension(2,4) :: jac
   real(dp), dimension(4,4) :: dqdotdT
   real(dp), dimension(4,4) :: dTbar4dT
-
+  integer,  dimension(2)   :: surf_ij_m
+  real(dp), dimension(2)   :: res
+  real(dp), dimension(2,4) :: jac
   interface
-     function mat_vec_mult(A, v) result (w)
+     ! required since this function exists outside mod_rad_encl_lib.f90
+     function mat_vec_mult(A, v) result (w) ! required since this exists outside mod_rad_encl_lib.f90
        use mod_precision
        implicit none
        real(kind=dp), dimension(:,:), intent(in) :: A
@@ -610,30 +611,16 @@ subroutine bc_del_encl_rad(U)
        real(kind=dp), dimension( SIZE(A,1) )     :: w
      end function mat_vec_mult
 
-     subroutine el_bc_matrix_to_global_matrix(nnpe, nn_b, el_jac, res)
-       use mod_precision
-       use mod_constants
-       use mod_nodes_elements
-       implicit none
-       integer,        intent(in)                       :: nnpe
-       integer,        intent(in), dimension(nnpe)      :: nn_b
-       real(kind=dp),  intent(in), dimension(nnpe,nnpe) :: el_jac
-       real(kind=dp),  intent(in), dimension(nnpe)      :: res
-     end subroutine el_bc_matrix_to_global_matrix
-
   end interface
 
   mr(i,j,nhbp1) = j + nhbp1 - i   ! local to global no transformation
 
-  ! i-j node number pairs for each enclosure side
-  nn_i(1:4) = nn_1(1:4)
-  nn_j(1:4) = nn_1(2:5)
   ! calculate side temperatures as average of two nodal 
   ! temperatures on each enclosure side
   do m=1,4
-     nn_er(1:4) = nn_encl_rad(m,1:4) ! create 1-d nodal array
-     i = nn_er(1)
-     j = nn_er(2)
+!     nn_er(1:4) = nn_encl_rad(m,1:4) ! create 1-d nodal array
+     i = surf_ij(m,1)
+     j = surf_ij(m,2)
      t_i = t_li(i)
      t_j = t_li(j)
      Tbar(m) = pt5*(t_i + t_j) ! avg T for edge i-j
@@ -642,11 +629,10 @@ subroutine bc_del_encl_rad(U)
   end do
   ! calculate heat flux for all enclosure sides
   ! [U] is the matrix defined by {q_r} = [U]{e_b} and was calculated earlier
-  q_r = mat_vec_mult(U,e_b)  ! in encl eqn, incident flux is +
+  q_r = mat_vec_mult(U,e_b)  ! in encl eqn, outflow flux is +
   ! debug information
   write(6,"(' Tbar = ',4es13.5)") (tbar(m),m=1,4)
   write(6,"(' q_r = ',4es13.5)") (q_r(m),m=1,4)
-!  q_r = -q_r                 ! sign change because outflow is +
 
   ! calculate matrix dTbar^4/dT, Tbar is array of enclosure side temps
   !                              T    is array of enclosure node temps
@@ -667,42 +653,38 @@ subroutine bc_del_encl_rad(U)
   ! note that sigma is built into dTbar^4/dT
   dqdotdT = two*matmul(U,dTbar4dT)
 
-
+  write(6,"(4i4)") (nn_encl_rad(j),j=1,4)
   ! loop on no of sides in enclosure
   do m=1,4
-     nn_er(1:4) = nn_encl_rad(m,1:4) ! create 1-d nodal array
-!     i = nn_er(1)
-!     j = nn_er(2)
-!     nn_b(1) = i
-!     nn_b(2) = j
-     q_r(1) = 14674.24042_dp
-     q_r(2) = zero
-     q_r(3) = -q_r(1)
-     q_r(4) = zero
-     res(1) = -q_r(m)*sij(m)*pt5
+!!$     q_r(1) = 14674.24042_dp
+!!$     q_r(2) = zero
+!!$     q_r(3) = -q_r(1)
+!!$     q_r(4) = zero
+     surf_ij_m(:) = surf_ij(m,:)
+     res = zero
+     res(1) = q_r(m)*sij(m)*pt5
      res(2) = res(1)
-!     res(1:2) = zero
-     jac(1,1:4) = -pt5*sij(m)*dqdotdt(m,1:4)
+     jac(1,1:4) = pt5*sij(m)*dqdotdt(m,1:4)
      jac(2,1:4) = jac(1,1:4)
-     jac = zero
+!     jac = zero
      
      ! merge elem bc contribution into global matrix
-!     call el_bc_matrix_to_global_matrix(2, nn_b, jac, res)
+     write(6,"(3i4)") m, (surf_ij_m(j), j=1,2)
      call el_encl_rad_bc_matrix_to_global_matrix &
-          (2, 4, nn_er, jac, res)
+          (2, 4, surf_ij_m, nn_encl_rad, jac, res)
   end do
 
 end subroutine bc_del_encl_rad
 
 subroutine el_encl_rad_bc_matrix_to_global_matrix &
-     (nnps, nn_s, nn_er, jac, res)
+     (nnps, nn_s, surf_ij_m, nn_er, jac, res)
 
-  ! nnps  = no nodes per side (2 for now)
-  ! nn_s  = no sides per enclosure (4 for now)
-  ! nn_er = array, nodes defining enclosure
-  !         note that first two entries define nodes in side
-  ! jac   = Jacobian, (2 x 4 for encl rad bc)
-  ! res   = Residual, (2 for encl rad bc)
+  ! nnps      = no nodes per side (2 for now)
+  ! nn_s      = no sides per enclosure (4 for now)
+  ! surf_ij_m = node pair (i,j) for side m
+  ! nn_er     = array of nodes defining enclosure
+  ! jac       = Jacobian, (2 x 4 for encl rad bc)
+  ! res       = Residual, (2 for encl rad bc)
 
   use mod_precision
   use mod_constants
@@ -710,9 +692,12 @@ subroutine el_encl_rad_bc_matrix_to_global_matrix &
   implicit none
   integer,        intent(in)                       :: nnps
   integer,        intent(in)                       :: nn_s
+  integer,        intent(in), dimension(nnps)      :: surf_ij_m
   integer,        intent(in), dimension(nn_s)      :: nn_er
   real(kind=dp),  intent(in), dimension(nnps,nn_s) :: jac
   real(kind=dp),  intent(in), dimension(nnps)      :: res
+
+  ! local variables
   integer                                          :: i, ii, j, jj, kk, mr
 
   mr(i,j,nhbp1) = j + nhbp1 - i   ! local to global no transformation
@@ -722,7 +707,7 @@ subroutine el_encl_rad_bc_matrix_to_global_matrix &
   ! because of the banded storage structure of the [C] matrix
 
   do ii = 1,nnps           ! ii = local node no
-     i = nn_er(ii)         ! node no of bc node
+     i = surf_ij_m(ii)     ! node no of bc node
      b(i) = b(i) - res(ii) ! residual contribution
      do jj = 1,nn_s
         j = nn_er(jj)

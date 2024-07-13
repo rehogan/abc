@@ -137,15 +137,15 @@ program abc
        implicit none
      end subroutine read_input
 
-!!$     subroutine verification(num_node,geom_typ,n_time,time,r,x,z,t,sdot)
-!!$       use mod_verify
-!!$       implicit none
-!!$       integer, intent(in) :: num_node, n_time
-!!$       real(kind=wp),  intent(in) :: time             
-!!$       real(kind=wp),  optional, intent(in) :: sdot
-!!$       real(kind=wp), dimension(*), intent(in) :: r, t, x, z
-!!$       character (len=11), intent(in) :: geom_typ
-!!$     end subroutine verification
+     subroutine verification(num_node,geom_typ,n_time,time,r,x,z,t,sdot)
+       use mod_precision
+       use mod_constants
+       implicit none
+       integer,   intent(in)               :: num_node, n_time
+       real(dp),  intent(in), optional     :: time, sdot
+       real(dp),  intent(in), dimension(*) :: r, t, x, z
+       character(len=11), intent(in)     :: geom_typ
+     end subroutine verification
 
      subroutine open_files
        use mod_files
@@ -242,8 +242,8 @@ program abc
         write(kver,"('# iter = ',i3)") iter
         geom_typ = 'PLANAR'
         if(verif == 'yes') then
-!!$           call verification(no_nodes/2,geom_typ,n_time,time,&
-!!$                x_num,x_num,x_num,T_num)
+           call verification(no_nodes/2,geom_typ,n_time,time,&
+                x_num,x_num,x_num,T_li)
         end if
         ! write output
              write(6,"(' time = ',es13.5, '   iter = ',i3)") time, iter
