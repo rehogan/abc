@@ -1,4 +1,5 @@
-
+! this is test
+! add 2nd line
 program abc
   ! abc = any body's code
   use mod_precision
