@@ -1,5 +1,4 @@
-! this is test
-! add 2nd line
+! this is tes
 program abc
   ! abc = any body's code
   use mod_precision
