@@ -1,5 +1,4 @@
 ! this is tes
-!  new edit
 program abc
   ! abc = any body's code
   use mod_precision
