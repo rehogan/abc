@@ -79,6 +79,9 @@ include .depend
 depend .depend: $(SRCS) $(MODS)
 	makedepf90 -o abc_db.exe  $(SRCS) $(MODS)  > .depend
 
+# To make "forced_compile" the default target, ie work with just "make",
+# move it direcely below the "OBJS" definition and
+# comment out the "include .depend" and "depend" targets
 .PHONY: forced_compile
 forced_compile:
 	@(echo "Forced compile of all routines")
