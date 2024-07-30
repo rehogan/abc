@@ -173,7 +173,6 @@ program abc
   end if     
   if(no_arg <= 1) stop         ! allows testing of input reader without grid data
   call read_aba_node_elem_blk  ! read abaqus data file for node/element data
-  call initialize              ! initialize some arrays, do geometry
   time_ini = zero              ! initial time
   time_fin = zero              ! final time
   dtime(:) = zero
@@ -181,6 +180,9 @@ program abc
      ss = 'yes'
      last_index = first_index
   end if
+  ! begin the solution loop
+  !  ss needs to be set prior to initialize... so I moved initialize below ss getting set
+  call initialize              ! initialize some arrays, do geometry, initialize temperature
 
   do n_time = first_index,last_index
      theta = one                  ! 1st time step must have theta = 1
@@ -214,7 +216,7 @@ program abc
 
         ! solve linear system of equations
         call band(no_nodes,nfb,c,b,z) ! solve linear system
-        t_li(:) = t_li(:) + z(:)      ! add corr vec to last iter
+        t_li(:) = t_li(:) + z(1:no_nodes)      ! add corr vec to last iter
 
         ! calculate maximum temperature correction
         max_corr = zero

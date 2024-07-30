@@ -1,7 +1,7 @@
 #!/bin/sh  -V
 # gfortran -Wimplicit-interface abc.f90 -o abc.exe
 FC = gfortran
-FFLAGS = -g -Wimplicit-interface
+FFLAGS = -g -Wimplicit-interface -fcheck=all -Wall -Wno-unused-variable -Wno-unused-dummy-argument 
 EXE = abc_db.exe
 LIBS =
 LDFLAGS = 

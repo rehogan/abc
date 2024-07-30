@@ -3,7 +3,7 @@ module mod_lin_interp
   implicit none
 
 contains
-real function lin_interp_fun(f, x_j, x_jp1)
+real(dp) function lin_interp_fun(f, x_j, x_jp1)
   use mod_precision
   use mod_constants
   implicit none

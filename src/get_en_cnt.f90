@@ -40,6 +40,9 @@ subroutine get_en_cnt
   allocate(v_scv(4,no_elem))
   dz = one                 ! length of element in z-direction
   do ne=1,no_elem
+     !    print*, ne, nn(:,ne)
+     print*, no_elem
+     print*, nn
      x_g(:) = x(nn(:,ne))  ! vector (1:4) of x-coord of elem ne
      y_g(:) = y(nn(:,ne))  ! vector (1:4) of y-coord of elem ne
      call vol_of_scv_quad(ne,x_g,y_g)

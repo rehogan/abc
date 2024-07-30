@@ -4,7 +4,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Compile abc",
+            "label": "Forced Compile abc",
             "type": "shell",
             "command": "make forced_compile",
             "presentation": {

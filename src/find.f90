@@ -117,7 +117,6 @@ SUBROUTINE FIND (IV, NMAX, IV_VAL, JLO, F)
 !**************** FIRST EXECUTABLE STATEMENT OF FIND ******************
 
 ! is first guess below lower table limit or above upper table limit?
-
   IF(JLO .LE. 0 .OR. JLO .GT. NMAX) THEN ! You are outside of table limits.
      JLO = 1
   ENDIF
@@ -173,7 +172,8 @@ SUBROUTINE FIND (IV, NMAX, IV_VAL, JLO, F)
      RETURN
   ELSE                        ! Cut the interval in half and try again.
 
-     JM = (JHI + JLO)*pt5
+!!     JM = (JHI + JLO)*pt5
+     JM = (JHI + JLO)/2
      IF(IV_VAL > IV(JM)) THEN
         JLO = JM
      ELSE

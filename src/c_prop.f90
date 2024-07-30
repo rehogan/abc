@@ -1,6 +1,6 @@
 
 
-complex function c_prop(jlo,f,del_t,p,tt)
+complex(dp) function c_prop(jlo,f,del_t,p,tt)
   ! take f and jlo from subroutine find, perform the interpolation step and
   ! convert the interpolated quantity to a complex variable
   ! p(jlo) <= p <= p(jlo + 1), dp/dT is sensitivity of p to T

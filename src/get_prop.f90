@@ -25,17 +25,18 @@ subroutine get_prop(tbar, mat_no_eb, cond, dk_dt, cp, dcp_dt, int_en)
      end subroutine find
 
   end interface
+  
   m = mat_no_eb ! shorten variable name, matl no elem block
-
   ! thermal conductivity interpolation
   call find(TT_cond(1,m),no_cond_ent(m),tbar,jlo,f)
 !  write(6,"(' f = ',f6.3, ' k_1 = ',f6.0, ' k_2 = ',f6.0)") &
 !      f,t_cond(jlo,m),t_cond(jlo+1,m)
   cond = lin_interp_fun(f,t_cond(jlo,m),t_cond(jlo+1,m))
   dk_dt = (t_cond(jlo+1,m) - t_cond(jlo,m))/(tt_cond(jlo+1,m) - tt_cond(jlo,m))
-!  write(6,"(' cond = ',f7.3, ' dk/dT = ',f7.3)") cond, dk_dt
+  !  write(6,"(' cond = ',f7.3, ' dk/dT = ',f7.3)") cond, dk_dt
   if(ss == 'yes') return     ! ss does not require heat capacity
   ! heat capacity interpolation
+  print*, 'm,  no_cp_ent', m, no_cp_ent 
   call find(TT_cp(1,m),no_cp_ent(m),tbar,jlo,f)
 !  write(6,"(' f = ',f6.3, ' cp_1 = ',f6.0, ' cp_2 = ',f6.0)") &
 !       f,t_cp(jlo,m),t_cp(jlo+1,m)

@@ -260,7 +260,8 @@ subroutine ludcmp(a,n,np,indx,row_ex,flag)
   integer                                   :: i, imax, j, k, max_facet
   real(dp)                                  :: aamax, dum, tiny, sum
   parameter (max_facet = 100, tiny = 1.0d-30)
-  integer,              dimension(max_facet) :: vv
+!!  integer,              dimension(max_facet) :: vv
+  real(dp),              dimension(max_facet) :: vv
   if (n .gt. max_facet) then
      write( 6,* ) 'subroutine ludcmp -- redimension max_facet'
      stop
@@ -569,12 +570,12 @@ subroutine vfac(w,h,f,s)
     len = sqrt((x(i) - x(j))**2 + (y(i) - y(j))**2)
   end function len
 
-  real function vfun3(i,j,k)
+  real(dp) function vfun3(i,j,k)
     integer, intent(in) :: i, j, k
     vfun3 = (len(i,j,x,y) + len(j,k,x,y) - len(k,i,x,y))/(2.*len(i,j,x,y))
   end function vfun3
 
-  real function vfun4(i,j,k,m)
+  real(dp) function vfun4(i,j,k,m)
     integer, intent(in) :: i, j, k, m
     vfun4 = (len(i,k,x,y) + len(j,m,x,y) -(len(j,k,x,y) + len(i,m,x,y)))&
          /(2.*len(i,j,x,y))
