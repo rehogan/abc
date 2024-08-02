@@ -22,6 +22,24 @@
             }
         },
         {
+            "label": "Make abc",
+            "type": "shell",
+            "command": "make abc_db.exe",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
             "label": "Clean abc directory",
             "type": "shell",
             "presentation": {
